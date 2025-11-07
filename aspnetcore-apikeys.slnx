@@ -1,0 +1,25 @@
+<Solution>
+  <Folder Name="/Build/">
+    <File Path=".gitignore" />
+    <File Path="bootstrap.ps1" />
+    <File Path="build.ps1" />
+    <File Path="build/repo.props" />
+    <File Path="build/sources.props" />
+    <File Path="README.md" />
+    <File Path="src/Directory.Build.props" />
+    <File Path="version.json" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="tests/Csg.AspNetCore.Authentication.ApiKey.Tests/Csg.AspNetCore.Authentication.ApiKey.Tests.csproj" />
+  </Folder>
+  <Project Path="src/Csg.AspNetCore.Authentication.ApiKey.Client/Csg.ApiKeyGenerator.csproj" />
+  <Project Path="src/Csg.AspNetCore.Authentication.ApiKey.KeyVault/Csg.AspNetCore.Authentication.ApiKey.KeyVault.csproj" />
+  <Project Path="src/Csg.AspNetCore.Authentication.ApiKey.SqlServer/Csg.AspNetCore.Authentication.ApiKey.SqlServer.csproj">
+    <Build Solution="Release|*" Project="false" />
+  </Project>
+  <Project Path="src/Csg.AspNetCore.Authentication.ApiKey/Csg.AspNetCore.Authentication.ApiKey.csproj" />
+  <Project Path="src/ExampleAPI/ExampleAPI.csproj">
+    <Build Solution="Release|*" Project="false" />
+  </Project>
+  <Project Path="src/ExampleClient/ExampleClient.csproj" />
+</Solution>

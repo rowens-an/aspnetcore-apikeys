@@ -1,44 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace Csg.AspNetCore.Authentication.ApiKey;
 
-namespace Csg.AspNetCore.Authentication.ApiKey
+public class ApiKeyOptions : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
 {
-    public class ApiKeyOptions : Microsoft.AspNetCore.Authentication.AuthenticationSchemeOptions
+    public string HeaderName { get; set; } = "ApiKey";
+
+    public string QueryString { get; set; } = "_apikey";
+
+    public string AuthenticationType { get; set; } = "ApiKey";
+
+    public new ApiKeyEvents Events
     {
-        public string HeaderName { get; set; } = "ApiKey";
+        get => (ApiKeyEvents)base.Events;
+        private init => base.Events = value;
+    }
 
-        public string QueryString { get; set; } = "_apikey";
-
-        public string AuthenticationType { get; set; } = "ApiKey";
-
-        public new ApiKeyEvents Events
-        {
-            get
-            {
-                return (ApiKeyEvents)base.Events;
-            }
-            set
-            {
-                base.Events = value;
-            }
-        }
-
-        public IApiKeyValidator KeyValidator { get; set; }
+    public IApiKeyValidator KeyValidator { get; set; }
         
-        public bool StaticKeyEnabled { get; set; } = true;
+    public bool StaticKeyEnabled { get; set; } = true;
 
-        public bool HttpBasicEnabled { get; set; } = true;
+    public bool HttpBasicEnabled { get; set; } = true;
 
-        public bool TimeBasedKeyEnabled { get; set; } = true;
+    public bool TimeBasedKeyEnabled { get; set; } = true;
 
-        public int TimeBasedKeyInterval { get; set; } = 60;
+    public int TimeBasedKeyInterval { get; set; } = 60;
 
-        public int TimeBasedKeyTolerance { get; set; } = 1;
+    public int TimeBasedKeyTolerance { get; set; } = 1;
         
-        public ApiKeyOptions() : base()
-        {
-            this.Events = new ApiKeyEvents();
-        }
+    public ApiKeyOptions() : base()
+    {
+        Events = new ApiKeyEvents();
     }
 }

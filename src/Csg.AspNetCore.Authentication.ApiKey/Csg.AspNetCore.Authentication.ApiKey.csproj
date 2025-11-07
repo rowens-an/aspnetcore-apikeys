@@ -1,15 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>Provides static and time-based API key authentication for ASP.NET Core projects.</Description>
     <OutputType>Library</OutputType>
 	<IsPackable>true</IsPackable>
+	<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+	<LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Csg.AspNetCore.Authentication.ApiKey.Client\Csg.ApiKeyGenerator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Nerdbank.GitVersioning" Version="3.9.50" />
   </ItemGroup>
 
 </Project>

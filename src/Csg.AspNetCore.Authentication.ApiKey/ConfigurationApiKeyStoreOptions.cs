@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Csg.AspNetCore.Authentication.ApiKey
+namespace Csg.AspNetCore.Authentication.ApiKey;
+
+public class ConfigurationApiKeyStoreOptions
 {
-    public class ConfigurationApiKeyStoreOptions
-    {
-        public IDictionary<string, string> Keys { get; set; }
-    }
+    public IDictionary<string, string> Keys { get; set; }
 }

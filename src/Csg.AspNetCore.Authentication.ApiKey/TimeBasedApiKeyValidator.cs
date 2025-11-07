@@ -1,39 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Csg.AspNetCore.Authentication.ApiKey
+namespace Csg.AspNetCore.Authentication.ApiKey;
+
+public class TimeBasedApiKeyValidator(TimeProvider timeProvider, ApiKeyGenerator.TimeBasedTokenGenerator generator)
+    : IApiKeyValidator
 {
-    public class TimeBasedApiKeyValidator : IApiKeyValidator
+    public TimeBasedApiKeyValidator(TimeProvider timeProvider) : this(timeProvider, new ApiKeyGenerator.TimeBasedTokenGenerator())
+    { }
+
+    public Task<bool> ValidateKeyAsync(ApiKey keyFromStore, string token)
     {
-        private readonly Csg.ApiKeyGenerator.TimeBasedTokenGenerator _generator;
-        private readonly Microsoft.AspNetCore.Authentication.ISystemClock _clock;
+        var now = timeProvider.GetUtcNow();
 
-        public TimeBasedApiKeyValidator(Microsoft.AspNetCore.Authentication.ISystemClock clock)
-        {
-            _generator = new Csg.ApiKeyGenerator.TimeBasedTokenGenerator();
-            _clock = clock;
-        }
+        var tokenBytes = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Decode(token);
 
-        public TimeBasedApiKeyValidator(Microsoft.AspNetCore.Authentication.ISystemClock clock, Csg.ApiKeyGenerator.TimeBasedTokenGenerator generator)
-        {
-            _generator = generator;
-            _clock = clock;
-        }
-
-        public Task<bool> ValidateKeyAsync(ApiKey keyFromStore, string token)
-        {
-            var now = _clock.UtcNow;
-
-            var tokenBytes = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Decode(token);
-
-            if (!_generator.ValidateToken(keyFromStore.ClientID, keyFromStore.Secret, tokenBytes, now))
-            {
-                return Task.FromResult(false);
-            }
-
-            return Task.FromResult(true);
-        }
+        return Task.FromResult(generator.ValidateToken(keyFromStore.ClientID, keyFromStore.Secret, tokenBytes, now));
     }
 }

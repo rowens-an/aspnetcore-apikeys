@@ -1,38 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Csg.AspNetCore.Authentication.ApiKey.Tests
+namespace Csg.AspNetCore.Authentication.ApiKey.Tests;
+
+public class FakeKeyStore : IApiKeyStore
 {
-    public class FakeKeyStore : Csg.AspNetCore.Authentication.ApiKey.IApiKeyStore
+    public bool SupportsClaims => false;
+
+    public Task<ICollection<Claim>> GetClaimsAsync(ApiKey key)
     {
-        public bool SupportsClaims => false;
+        throw new NotImplementedException();
+    }
 
-        public Task<ICollection<Claim>> GetClaimsAsync(ApiKey key)
+    public Task<ApiKey> GetKeyAsync(string keyName)
+    {
+        if (keyName.Equals("TestName", StringComparison.OrdinalIgnoreCase))
         {
-            throw new NotImplementedException();
+            return Task.FromResult(new ApiKey { ClientID = "TestName", Secret = "TestKey" });
         }
-
-        public Task<ApiKey> GetKeyAsync(string keyName)
+        else if (keyName == "NullKey")
         {
-            if (keyName.Equals("TestName", StringComparison.OrdinalIgnoreCase))
-            {
-                return Task.FromResult(new ApiKey() { ClientID = "TestName", Secret = "TestKey" });
-            }
-            else if (keyName == "NullKey")
-            {
-                return Task.FromResult<ApiKey>(new ApiKey() { ClientID = "BlankKey", Secret = null });
-            }
-            else if (keyName == "BlankKey")
-            {
-                return Task.FromResult<ApiKey>(new ApiKey() { ClientID = "BlankKey", Secret = string.Empty });
-            }
-            else
-            {
-                return Task.FromResult<ApiKey>(null);
-            }
+            return Task.FromResult<ApiKey>(new ApiKey { ClientID = "BlankKey", Secret = null });
+        }
+        else if (keyName == "BlankKey")
+        {
+            return Task.FromResult<ApiKey>(new ApiKey { ClientID = "BlankKey", Secret = string.Empty });
+        }
+        else
+        {
+            return Task.FromResult<ApiKey>(null);
         }
     }
 }

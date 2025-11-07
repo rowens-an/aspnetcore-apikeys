@@ -1,40 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Csg.AspNetCore.Authentication.ApiKey
+namespace Csg.AspNetCore.Authentication.ApiKey;
+
+public class ConfigurationApiKeyStore(
+    Microsoft.Extensions.Options.IOptionsMonitor<ConfigurationApiKeyStoreOptions> options)
+    : IApiKeyStore
 {
-    public class ConfigurationApiKeyStore : IApiKeyStore
+    public Task<ApiKey> GetKeyAsync(string clientID)
     {
-        private Microsoft.Extensions.Options.IOptionsMonitor<ConfigurationApiKeyStoreOptions> _options;
-
-        public ConfigurationApiKeyStore(Microsoft.Extensions.Options.IOptionsMonitor<ConfigurationApiKeyStoreOptions> options)
+        if (options.CurrentValue.Keys == null)
         {
-            _options = options;
-        }
-
-        public Task<ApiKey> GetKeyAsync(string clientID)
-        {
-            if (_options.CurrentValue.Keys == null)
-            {
-                return Task.FromResult<ApiKey>(null);
-            }
-
-            if(_options.CurrentValue.Keys.TryGetValue(clientID, out string secret))
-            {
-                return Task.FromResult(new ApiKey() { ClientID = clientID, Secret = secret });
-            }
-
             return Task.FromResult<ApiKey>(null);
         }
 
-        public bool SupportsClaims { get { return false; } }
+        return options.CurrentValue.Keys.TryGetValue(clientID, out var secret) ? 
+            Task.FromResult(new ApiKey { ClientID = clientID, Secret = secret }) : 
+            Task.FromResult<ApiKey>(null);
+    }
 
-        public Task<ICollection<Claim>> GetClaimsAsync(ApiKey key)
-        {
-            throw new NotSupportedException();
-        }
+    public bool SupportsClaims => false;
+
+    public Task<ICollection<Claim>> GetClaimsAsync(ApiKey key)
+    {
+        throw new NotSupportedException();
     }
 }

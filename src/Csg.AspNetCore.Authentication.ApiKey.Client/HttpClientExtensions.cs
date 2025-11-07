@@ -1,49 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Csg.ApiKeyGenerator;
+﻿using Csg.ApiKeyGenerator;
 
-namespace System.Net.Http
+namespace System.Net.Http;
+
+public static class HttpClientExtensions
 {
-    public static class HttpClientExtensions
+    private static readonly TimeBasedTokenGenerator DefaultTokenGenerator = new();
+
+    public static void AddApiKeyAuthorizationHeader(this HttpClient client, 
+        string clientID, 
+        string secret, 
+        DateTimeOffset utcNow,
+        TimeBasedTokenGenerator tokenGenerator = null)
     {
-        private const string Authorization = "Authorization";
-        private static readonly TimeBasedTokenGenerator _defaultTokenGenerator = new TimeBasedTokenGenerator();
+        client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret, utcNow, tokenGenerator);  
+    }
 
-        public static void AddApiKeyAuthorizationHeader(this System.Net.Http.HttpClient client, 
-            string clientID, 
-            string secret, 
-            DateTimeOffset utcNow,
-            TimeBasedTokenGenerator tokenGenerator = null)
-        {
-            client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret, utcNow, tokenGenerator);  
-        }
+    // ReSharper disable once MemberCanBePrivate.Global
+    public static void AddApiKeyAuthorizationHeader(this Headers.HttpRequestHeaders headers, 
+        string clientID, 
+        string secret, 
+        DateTimeOffset utcNow, 
+        TimeBasedTokenGenerator tokenGenerator = null)
+    {
+        tokenGenerator ??= DefaultTokenGenerator;
 
-        public static void AddApiKeyAuthorizationHeader(this System.Net.Http.Headers.HttpRequestHeaders headers, 
-            string clientID, 
-            string secret, 
-            DateTimeOffset utcNow, 
-            TimeBasedTokenGenerator tokenGenerator = null)
-        {
-            tokenGenerator = tokenGenerator ?? _defaultTokenGenerator;
+        var token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(tokenGenerator.ComputeToken(clientID, secret, utcNow));
 
-            string token = Microsoft.AspNetCore.WebUtilities.Base64UrlTextEncoder.Encode(tokenGenerator.ComputeToken(clientID, secret, utcNow));
+        headers.Add("Authorization", $"TAPIKEY {clientID}:{token}");
+    }
 
-            headers.Add("Authorization", $"TAPIKEY {clientID}:{token}");
-        }
+    // ReSharper disable once MemberCanBePrivate.Global
+    public static void AddApiKeyAuthorizationHeader(this Headers.HttpRequestHeaders headers, string clientID, string secret)
+    {
+        secret = WebUtility.UrlEncode(secret);
+        headers.Add("Authorization", $"APIKEY {clientID}:{secret}");
+    }
 
-        public static void AddApiKeyAuthorizationHeader(this System.Net.Http.Headers.HttpRequestHeaders headers, string clientID, string secret)
-        {
-            secret = System.Net.WebUtility.UrlEncode(secret);
-            headers.Add("Authorization", $"APIKEY {clientID}:{secret}");
-        }
-
-        public static void AddApiKeyAuthorizationHeader(this System.Net.Http.HttpClient client,
-            string clientID,
-            string secret)
-        {
-            client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret);
-        }
-
+    public static void AddApiKeyAuthorizationHeader(this HttpClient client,
+        string clientID,
+        string secret)
+    {
+        client.DefaultRequestHeaders.AddApiKeyAuthorizationHeader(clientID, secret);
     }
 }

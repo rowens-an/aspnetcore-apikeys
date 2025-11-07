@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace Csg.AspNetCore.Authentication.ApiKey
+namespace Csg.AspNetCore.Authentication.ApiKey;
+
+public interface IApiKeyStore
 {
-    public interface IApiKeyStore
-    {
-        Task<ApiKey> GetKeyAsync(string clientID);
+    Task<ApiKey> GetKeyAsync(string clientID);
 
-        bool SupportsClaims { get; }
+    bool SupportsClaims { get; }
 
-        Task<System.Collections.Generic.ICollection<System.Security.Claims.Claim>> GetClaimsAsync(ApiKey key);
-    }
+    Task<System.Collections.Generic.ICollection<System.Security.Claims.Claim>> GetClaimsAsync(ApiKey key);
 }
